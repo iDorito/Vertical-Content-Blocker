@@ -38,9 +38,8 @@ The foundational philosophy of this blocker is grounded in peer-reviewed behavio
 Until this extension is officially published on the web stores, you can install it manually in **Developer Mode** on any major browser.
 
 ### 📥 Step 1: Download the Extension
-1. Click the green **`<> Code`** button at the top of this repository.
-2. Select **`Download ZIP`**.
-3. Extract the downloaded `.zip` file into a folder on your computer (e.g., `Documents/Neural-Shield`).
+1. Download the beta release version in the `releases` section.
+2. Extract the downloaded `.zip` file into a folder on your computer (e.g., `Documents/Neural-Shield`).
 
 ### 🌐 Step 2: Install by Browser
 
