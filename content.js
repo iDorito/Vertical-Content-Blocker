@@ -159,6 +159,7 @@ function runBlocker() {
   const activeSelectors = platform ? SELECTORS[platform] : [];
 
   function deepClean() {
+    
     // Eliminación por selectores (Protección contra error en línea 166)
     activeSelectors.forEach(sel => {
       try {
@@ -170,6 +171,10 @@ function runBlocker() {
     
     // Especial Facebook: Detectar botón "Reel" por texto o aria-label
     if (host.includes('facebook')) {
+      const fbHomeReelButton = document.querySelector('div[role="main"] span:contains("Reel")');
+      if (fbHomeReelButton) {
+          fbHomeReelButton.closest('div[data-visualcompletion]')?.remove();
+      }
     // Buscamos cualquier elemento que mencione Reel en su texto o etiqueta
     document.querySelectorAll('span, div, a').forEach(el => {
       const isReel = el.innerText === 'Reel' || 
