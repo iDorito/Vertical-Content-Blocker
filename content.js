@@ -1,5 +1,5 @@
 /**
- * NEURAL SHIELD v2.1 - AGGRESSIVE BLOCKER
+ * NEURAL SHIELD v2.2 - HARDENED FOR PRODUCTION
  * Protege el enfoque eliminando contenido vertical adictivo.
  */
 
@@ -72,65 +72,83 @@ function killAllMedia() {
   });
 }
 
-// 4. SISTEMA DE BLOQUEO TOTAL (OVERLAY)
+// 4. SISTEMA DE BLOQUEO TOTAL (OVERLAY SANITIZADO)
 function showWarningOverlay() {
   if (document.getElementById('vertical-blocker-overlay')) return;
 
   const overlay = document.createElement('div');
   overlay.id = 'vertical-blocker-overlay';
-  overlay.style.cssText = `
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: #000; color: #fff; z-index: 2147483647;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Courier New', Courier, monospace; text-align: center;
-  `;
+  overlay.style.cssText = "position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;color:#fff;z-index:2147483647;display:flex;align-items:center;justify-content:center;font-family:monospace;text-align:center;";
 
   const puzzle = generatePuzzle();
+  const container = document.createElement('div');
+  container.style.cssText = "max-width:800px;padding:50px;border:2px solid #333;background:#000;";
 
-  overlay.innerHTML = `
-    <div style="max-width: 800px; padding: 50px; border: 2px solid #333; background: #000;">
-      <h1 style="font-size: 3rem; color: #ff0000; text-transform: uppercase;">${t.title}</h1>
-      <p style="font-size: 1.4rem; margin: 25px 0;">${t.message}</p>
-      <div style="background: #111; padding: 25px; margin: 20px 0; color: #888; text-align: left; border-left: 5px solid #ff0000;">
-        ${t.science}
-      </div>
-      <div style="margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
-        <button id="back-home-btn" style="padding: 20px 50px; background: #fff; color: #000; font-weight: bold; cursor: pointer; border: none; width: 100%; text-transform: uppercase;">${t.btnBack}</button>
-        <button id="bypass-trigger" style="background: transparent; color: #444; text-decoration: underline; border: none; cursor: pointer;">${t.btnBypass}</button>
-        <div id="puzzle-area" style="display: none; margin-top: 20px; background: #222; padding: 20px; border-radius: 10px;">
-          <p>${t.puzzlePrompt} <strong>${puzzle.q}</strong></p>
-          <input type="number" id="puzzle-input" style="padding: 10px; width: 80px; background: #000; color: #fff; border: 1px solid #ff0000;">
-          <button id="puzzle-check" style="padding: 10px; background: #ff0000; color: #fff; border: none; cursor: pointer;">OK</button>
-        </div>
-      </div>
-    </div>
-  `;
-  
-  document.documentElement.appendChild(overlay);
-  const killInterval = setInterval(killAllMedia, 500);
+  const h1 = document.createElement('h1');
+  h1.style.cssText = "font-size:3rem;color:#ff0000;text-transform:uppercase;margin:0;";
+  h1.textContent = t.title;
 
-  document.getElementById('back-home-btn').onclick = () => {
+  const pMsg = document.createElement('p');
+  pMsg.style.cssText = "font-size:1.4rem;margin:25px 0;";
+  pMsg.textContent = t.message;
+
+  const scienceDiv = document.createElement('div');
+  scienceDiv.style.cssText = "background:#111;padding:25px;margin:20px 0;color:#888;text-align:left;border-left:5px solid #ff0000;";
+  scienceDiv.textContent = t.science;
+
+  const actions = document.createElement('div');
+  actions.style.cssText = "margin-top:40px;display:flex;flex-direction:column;align-items:center;gap:20px;";
+
+  const btnBack = document.createElement('button');
+  btnBack.style.cssText = "padding:20px 50px;background:#fff;color:#000;font-weight:bold;cursor:pointer;border:none;width:100%;text-transform:uppercase;";
+  btnBack.textContent = t.btnBack;
+  btnBack.onclick = () => {
     const host = location.hostname;
-    if (host.includes('youtube')) location.href = 'https://www.youtube.com';
-    else if (host.includes('facebook')) location.href = 'https://www.facebook.com';
-    else location.href = 'https://www.google.com';
+    location.href = host.includes('youtube') ? 'https://www.youtube.com' : (host.includes('facebook') ? 'https://www.facebook.com' : 'https://www.google.com');
   };
 
-  document.getElementById('bypass-trigger').onclick = () => {
-    document.getElementById('puzzle-area').style.display = 'block';
-  };
+  const btnBypass = document.createElement('button');
+  btnBypass.style.cssText = "background:transparent;color:#444;text-decoration:underline;border:none;cursor:pointer;";
+  btnBypass.textContent = t.btnBypass;
 
-  document.getElementById('puzzle-check').onclick = () => {
-    if (parseInt(document.getElementById('puzzle-input').value) === puzzle.a) {
+  const puzArea = document.createElement('div');
+  puzArea.style.cssText = "display:none;margin-top:20px;background:#222;padding:20px;border-radius:10px;";
+  
+  const puzText = document.createElement('p');
+  puzText.textContent = t.puzzlePrompt;
+  const puzStrong = document.createElement('strong');
+  puzStrong.textContent = puzzle.q;
+  puzText.appendChild(puzStrong);
+
+  const puzInput = document.createElement('input');
+  puzInput.type = "number";
+  puzInput.style.cssText = "padding:10px;width:80px;background:#000;color:#fff;border:1px solid #ff0000;margin:0 10px;";
+
+  const puzBtn = document.createElement('button');
+  puzBtn.style.cssText = "padding:10px;background:#ff0000;color:#fff;border:none;cursor:pointer;";
+  puzBtn.textContent = "OK";
+
+  // Logic
+  btnBypass.onclick = () => { puzArea.style.display = 'block'; };
+  puzBtn.onclick = () => {
+    if (parseInt(puzInput.value) === puzzle.a) {
       clearInterval(killInterval);
       overlay.remove();
-      const nuke = document.getElementById('nuclear-block-css');
-      if (nuke) nuke.remove();
+      document.getElementById('nuclear-block-css')?.remove();
     } else {
       alert(t.error);
       location.reload();
     }
   };
+
+  // Build
+  puzArea.append(puzText, puzInput, puzBtn);
+  actions.append(btnBack, btnBypass, puzArea);
+  container.append(h1, pMsg, scienceDiv, actions);
+  overlay.appendChild(container);
+  document.documentElement.appendChild(overlay);
+
+  const killInterval = setInterval(killAllMedia, 500);
 }
 
 // 5. LIMPIEZA DINÁMICA DE ELEMENTOS
@@ -138,7 +156,6 @@ function runBlocker() {
   const host = location.hostname;
   const path = location.pathname;
 
-  // Verificación de página de Reels
   const isShortsPage = (host.includes('youtube') && path.includes('/shorts')) ||
                        (host.includes('instagram') && (path.includes('/reels') || path.includes('/reel/'))) ||
                        (host.includes('facebook') && (path.includes('/reels') || path.includes('/reel/'))) ||
@@ -159,43 +176,25 @@ function runBlocker() {
   const activeSelectors = platform ? SELECTORS[platform] : [];
 
   function deepClean() {
-    
-    // Eliminación por selectores (Protección contra error en línea 166)
     activeSelectors.forEach(sel => {
       try {
         document.querySelectorAll(sel).forEach(el => el.remove());
-      } catch (e) {
-        // Ignorar selectores inválidos o no soportados
-      }
+      } catch (e) {}
     });
     
-    // Especial Facebook: Detectar botón "Reel" por texto o aria-label
     if (host.includes('facebook')) {
-      const fbHomeReelButton = document.querySelector('div[role="main"] span:contains("Reel")');
-      if (fbHomeReelButton) {
-          fbHomeReelButton.closest('div[data-visualcompletion]')?.remove();
-      }
-    // Buscamos cualquier elemento que mencione Reel en su texto o etiqueta
-    document.querySelectorAll('span, div, a').forEach(el => {
-      const isReel = el.innerText === 'Reel' || 
-                    el.innerText === 'Reels' || 
-                    el.getAttribute('aria-label')?.includes('Reel');
-
-      if (isReel) {
-        // Facebook mete los botones en estructuras de 'listitem' o 'link'
-        const container = el.closest('div[role="listitem"]') || 
-                          el.closest('div[role="link"]') || 
-                          el.closest('a');
-        
-        if (container) {
-          container.style.display = 'none'; // Lo ocultamos primero para que sea instantáneo
-          container.remove(); // Luego lo borramos del mapa
+      document.querySelectorAll('span, div, a').forEach(el => {
+        const isReel = el.innerText === 'Reel' || el.innerText === 'Reels' || el.getAttribute('aria-label')?.includes('Reel');
+        if (isReel) {
+          const container = el.closest('div[role="listitem"]') || el.closest('div[role="link"]') || el.closest('a') || el.closest('div[data-visualcompletion]');
+          if (container) {
+            container.style.display = 'none';
+            container.remove();
+          }
         }
-      }
-    });
-  }
+      });
+    }
 
-    // Especial YouTube: Quitar estantes de shorts por título
     if (host.includes('youtube')) {
       document.querySelectorAll('#title-container, #header').forEach(header => {
         if (header.innerText.includes('Shorts')) {
@@ -210,7 +209,7 @@ function runBlocker() {
   new MutationObserver(deepClean).observe(document.body, { childList: true, subtree: true });
 }
 
-// 6. INICIO
+// 6. INIT
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', runBlocker);
 } else {
