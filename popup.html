@@ -1,9 +1,68 @@
 <!DOCTYPE html>
 <html>
-<head><style>body {width:250px;padding:20px;font-family:system-ui;}</style></head>
+<head>
+  <style>
+    body {
+      width: 300px;
+      padding: 0;
+      margin: 0;
+      background: #000;
+      color: #ff0000;
+      font-family: 'Courier New', Courier, monospace;
+      border: 1px solid #333;
+    }
+    .container {
+      padding: 20px;
+      text-align: center;
+    }
+    h2 {
+      font-size: 1.2rem;
+      margin: 0 0 10px 0;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .warning-box {
+      background: #111;
+      border-left: 3px solid #ff0000;
+      padding: 10px;
+      font-size: 0.85rem;
+      color: #ccc;
+      text-align: left;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    .science-stat {
+      font-weight: bold;
+      color: #ff0000;
+      display: block;
+      margin-bottom: 5px;
+    }
+    #toggle {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      color: #444;
+      border: 1px solid #444;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    #toggle:hover {
+      background: #ff0000;
+      color: #fff;
+      border-color: #ff0000;
+    }
+  </style>
+</head>
 <body>
-  <h3>Vertical Blocker</h3>
-  <button id="toggle">Disable for this site</button>
+  <div class="container">
+    <h2 id="title">Neural Shield</h2>
+    <div class="warning-box">
+      <span class="science-stat" id="stat-head">NEUROPLASTICITY ALERT:</span>
+      <span id="description">Your brain is physically re-wiring itself to expect 15-second rewards. This kills long-term ambition.</span>
+    </div>
+    <button id="toggle">Surrender & Rot</button>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>

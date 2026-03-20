@@ -1,104 +1,210 @@
-// ===== CONFIG =====
-const WARNING_MESSAGE = "Vertical short-form content (Reels, Shorts, TikTok, etc.) is detrimental for focus and kids. Consider long-form content instead.";
+/**
+ * NEURAL SHIELD v2.1 - AGGRESSIVE BLOCKER
+ * Protege el enfoque eliminando contenido vertical adictivo.
+ */
 
-const REDIRECT_SITES = {
-  youtube: "https://www.youtube.com",
-  instagram: "https://www.instagram.com",
-  tiktok: "https://www.tiktok.com",
-  facebook: "https://www.facebook.com",
-  snapchat: "https://www.snapchat.com"
+// 1. CONFIGURACIÓN Y LOCALIZACIÓN
+const LANG = navigator.language.startsWith('es') ? 'es' : 'en';
+
+const TEXT = {
+  en: {
+    title: "DIGITAL ROT DETECTED",
+    message: "You are attempting to access short-form content designed to hijack your dopamine receptors.",
+    science: "SCIENTIFIC REALITY: Rapid-fire vertical videos trigger dopamine loops that fragment your prefrontal cortex's ability to focus.",
+    btnBack: "Return to sanity (Go Home)",
+    btnBypass: "Proceed with brain atrophy",
+    puzzlePrompt: "To proceed, prove you still have a functioning brain. Solve: ",
+    error: "Wrong. Your focus is already slipping."
+  },
+  es: {
+    title: "PUTREFACCIÓN DIGITAL DETECTADA",
+    message: "Estás intentando acceder a contenido diseñado para secuestrar tus receptores de dopamina.",
+    science: "REALIDAD CIENTÍFICA: Los videos verticales rápidos activan bucles de dopamina que fragmentan la capacidad de enfoque de tu corteza prefrontal.",
+    btnBack: "Volver a la cordura (Ir al inicio)",
+    btnBypass: "Continuar con la atrofia cerebral",
+    puzzlePrompt: "Para continuar, demuestra que aún tienes cerebro. Resuelve: ",
+    error: "Incorrecto. Tu enfoque ya está desapareciendo."
+  }
 };
 
+const t = TEXT[LANG] || TEXT.en;
+
+// 2. SELECTORES AGRESIVOS
 const SELECTORS = {
   youtube: [
-    'ytd-reel-shelf-renderer', 
-    'ytd-rich-shelf-renderer[is-shorts]', 
-    'ytd-grid-video-renderer:has([overlay-style="SHORTS"])'
+    'ytd-reel-shelf-renderer',
+    'ytd-rich-shelf-renderer[is-shorts]',
+    'ytd-guide-entry-renderer:has(a[href="/shorts/"])',
+    'ytd-mini-guide-entry-renderer[aria-label="Shorts"]',
+    'a[href^="/shorts/"]'
   ],
-  instagram: ['[data-testid="reel"]', 'div[role="dialog"] a[href*="/reels/"]'],
-  facebook: ['[data-testid="reels"]', 'div[aria-label*="Reels"]'],
-  tiktok: ['.for-you-page', '[data-elem="recommendation"]', 'div[data-testid="feed-item"]'],
-  snapchat: ['[data-testid="spotlight"]', '.spotlight-feed'],
-  x: ['article:has(video[style*="aspect-ratio: 9/16"])']
+  instagram: [
+    'a[href*="/reels/"]',
+    'a[href*="/reel/"]',
+    'svg[aria-label="Reels"]',
+    'article:has(a[href*="/reels/"])'
+  ],
+  facebook: [
+    'a[href*="/reels/"]',
+    'a[href*="/reel/"]',
+    '[aria-label*="Reel"]',
+    '[aria-label*="reels"]',
+    'div[aria-label="Reels"]'
+  ],
+  tiktok: ['body'],
+  x: ['article:has(video)']
 };
 
+// 3. UTILIDADES MATEMÁTICAS Y DE AUDIO
+function generatePuzzle() {
+  const a = Math.floor(Math.random() * 12) + 5;
+  const b = Math.floor(Math.random() * 12) + 2;
+  return { q: `${a} x ${b} + 7`, a: (a * b) + 7 };
+}
+
+function killAllMedia() {
+  document.querySelectorAll('video, audio').forEach(media => {
+    try {
+      media.pause();
+      media.muted = true;
+      media.src = "";
+    } catch (e) {}
+  });
+}
+
+// 4. SISTEMA DE BLOQUEO TOTAL (OVERLAY)
 function showWarningOverlay() {
-  if (!document.body || document.getElementById('vertical-blocker-overlay')) return;
+  if (document.getElementById('vertical-blocker-overlay')) return;
 
   const overlay = document.createElement('div');
   overlay.id = 'vertical-blocker-overlay';
   overlay.style.cssText = `
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.95); color: white; z-index: 2147483647;
-    display: flex; align-items: center; justify-content: center; text-align: center;
-    font-family: system-ui; padding: 40px; box-sizing: border-box;
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: #000; color: #fff; z-index: 2147483647;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Courier New', Courier, monospace; text-align: center;
   `;
+
+  const puzzle = generatePuzzle();
+
   overlay.innerHTML = `
-    <div style="max-width: 600px;">
-      <h1 style="font-size: 2.5rem; margin-bottom: 20px;">⚠️ Focus Protection Active</h1>
-      <p style="font-size: 1.3rem; line-height: 1.5;">${WARNING_MESSAGE}</p>
-      <button id="proceed-btn" style="margin-top: 30px; padding: 15px 40px; font-size: 1.2rem; background: #ff4444; color: white; border: none; border-radius: 8px; cursor: pointer;">
-        I understand — hide this content
-      </button>
+    <div style="max-width: 800px; padding: 50px; border: 2px solid #333; background: #000;">
+      <h1 style="font-size: 3rem; color: #ff0000; text-transform: uppercase;">${t.title}</h1>
+      <p style="font-size: 1.4rem; margin: 25px 0;">${t.message}</p>
+      <div style="background: #111; padding: 25px; margin: 20px 0; color: #888; text-align: left; border-left: 5px solid #ff0000;">
+        ${t.science}
+      </div>
+      <div style="margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+        <button id="back-home-btn" style="padding: 20px 50px; background: #fff; color: #000; font-weight: bold; cursor: pointer; border: none; width: 100%; text-transform: uppercase;">${t.btnBack}</button>
+        <button id="bypass-trigger" style="background: transparent; color: #444; text-decoration: underline; border: none; cursor: pointer;">${t.btnBypass}</button>
+        <div id="puzzle-area" style="display: none; margin-top: 20px; background: #222; padding: 20px; border-radius: 10px;">
+          <p>${t.puzzlePrompt} <strong>${puzzle.q}</strong></p>
+          <input type="number" id="puzzle-input" style="padding: 10px; width: 80px; background: #000; color: #fff; border: 1px solid #ff0000;">
+          <button id="puzzle-check" style="padding: 10px; background: #ff0000; color: #fff; border: none; cursor: pointer;">OK</button>
+        </div>
+      </div>
     </div>
   `;
-  document.body.appendChild(overlay);
-  document.getElementById('proceed-btn').onclick = () => overlay.remove();
+  
+  document.documentElement.appendChild(overlay);
+  const killInterval = setInterval(killAllMedia, 500);
+
+  document.getElementById('back-home-btn').onclick = () => {
+    const host = location.hostname;
+    if (host.includes('youtube')) location.href = 'https://www.youtube.com';
+    else if (host.includes('facebook')) location.href = 'https://www.facebook.com';
+    else location.href = 'https://www.google.com';
+  };
+
+  document.getElementById('bypass-trigger').onclick = () => {
+    document.getElementById('puzzle-area').style.display = 'block';
+  };
+
+  document.getElementById('puzzle-check').onclick = () => {
+    if (parseInt(document.getElementById('puzzle-input').value) === puzzle.a) {
+      clearInterval(killInterval);
+      overlay.remove();
+      const nuke = document.getElementById('nuclear-block-css');
+      if (nuke) nuke.remove();
+    } else {
+      alert(t.error);
+      location.reload();
+    }
+  };
 }
 
-function blockVerticalContent() {
-  const hostname = location.hostname;
+// 5. LIMPIEZA DINÁMICA DE ELEMENTOS
+function runBlocker() {
+  const host = location.hostname;
+  const path = location.pathname;
 
-  // 1. Redirects
-  if (hostname.includes('youtube') && location.pathname.startsWith('/shorts/')) {
-    location.replace(REDIRECT_SITES.youtube); return;
-  }
-  if (hostname.includes('instagram') && location.pathname.includes('/reels/')) {
-    location.replace(REDIRECT_SITES.instagram); return;
-  }
-  if (hostname.includes('tiktok') && !location.pathname.includes('/following')) {
-    location.replace(REDIRECT_SITES.tiktok + '/following'); return;
-  }
-  if (hostname.includes('snapchat') && location.pathname.includes('spotlight')) {
-    location.replace(REDIRECT_SITES.snapchat); return;
-  }
+  // Verificación de página de Reels
+  const isShortsPage = (host.includes('youtube') && path.includes('/shorts')) ||
+                       (host.includes('instagram') && (path.includes('/reels') || path.includes('/reel/'))) ||
+                       (host.includes('facebook') && (path.includes('/reels') || path.includes('/reel/'))) ||
+                       (host.includes('tiktok'));
 
-  // 2. Element Hiding
-  const platform = Object.keys(SELECTORS).find(p => hostname.includes(p));
-  const selectors = platform ? SELECTORS[platform] : [];
-
-  function hideElements() {
-    if (selectors.length > 0) {
-      document.querySelectorAll(selectors.join(',')).forEach(el => el.remove());
+  if (isShortsPage) {
+    if (!document.getElementById('nuclear-block-css')) {
+      const style = document.createElement('style');
+      style.id = 'nuclear-block-css';
+      style.innerHTML = `body { overflow: hidden !important; } #content, #page-manager, #mount_0_0, .app-main { display: none !important; }`;
+      document.head.appendChild(style);
     }
-    document.querySelectorAll('video').forEach(v => {
-      if (v.videoHeight > v.videoWidth * 1.4) v.pause();
+    showWarningOverlay();
+    return;
+  }
+
+  const platform = Object.keys(SELECTORS).find(p => host.includes(p));
+  const activeSelectors = platform ? SELECTORS[platform] : [];
+
+  function deepClean() {
+    // Eliminación por selectores (Protección contra error en línea 166)
+    activeSelectors.forEach(sel => {
+      try {
+        document.querySelectorAll(sel).forEach(el => el.remove());
+      } catch (e) {
+        // Ignorar selectores inválidos o no soportados
+      }
     });
-  }
+    
+    // Especial Facebook: Detectar botón "Reel" por texto o aria-label
+    if (host.includes('facebook')) {
+      document.querySelectorAll('span, div, a').forEach(el => {
+        // Detecta texto directo o etiqueta de accesibilidad (hover)
+        const hasReelText = el.innerText === 'Reel' || el.innerText === 'Reels';
+        const hasReelAria = el.getAttribute('aria-label')?.toLowerCase().includes('reel');
 
-  hideElements();
-
-  // Ensure body exists before observing
-  if (document.body) {
-    const observer = new MutationObserver(hideElements);
-    observer.observe(document.body, { childList: true, subtree: true });
-  }
-
-  // Fixed Line 96 Error: Check length of selectors first
-  setTimeout(() => {
-    if (selectors.length > 0 && document.querySelectorAll(selectors.join(',')).length > 0) {
-      showWarningOverlay();
+        if (hasReelText || hasReelAria) {
+          // Eliminar el contenedor del botón para que no quede el hueco
+          el.closest('div[role="listitem"]')?.remove();
+          el.closest('div[role="link"]')?.remove();
+          el.closest('a')?.remove();
+        }
+      });
     }
-  }, 800);
+
+    // Especial YouTube: Quitar estantes de shorts por título
+    if (host.includes('youtube')) {
+      document.querySelectorAll('#title-container, #header').forEach(header => {
+        if (header.innerText.includes('Shorts')) {
+          header.closest('ytd-rich-shelf-renderer')?.remove();
+          header.closest('ytd-reel-shelf-renderer')?.remove();
+        }
+      });
+    }
+  }
+
+  deepClean();
+  new MutationObserver(deepClean).observe(document.body, { childList: true, subtree: true });
 }
 
-// Handle initialization for "document_start"
+// 6. INICIO
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', blockVerticalContent);
+  document.addEventListener('DOMContentLoaded', runBlocker);
 } else {
-  blockVerticalContent();
+  runBlocker();
 }
 
-// SPA Navigation listeners
-window.addEventListener('popstate', blockVerticalContent);
-window.addEventListener('yt-navigate-finish', blockVerticalContent);
+window.addEventListener('yt-navigate-finish', runBlocker);
+window.addEventListener('popstate', runBlocker);
