@@ -170,19 +170,25 @@ function runBlocker() {
     
     // Especial Facebook: Detectar botón "Reel" por texto o aria-label
     if (host.includes('facebook')) {
-      document.querySelectorAll('span, div, a').forEach(el => {
-        // Detecta texto directo o etiqueta de accesibilidad (hover)
-        const hasReelText = el.innerText === 'Reel' || el.innerText === 'Reels';
-        const hasReelAria = el.getAttribute('aria-label')?.toLowerCase().includes('reel');
+    // Buscamos cualquier elemento que mencione Reel en su texto o etiqueta
+    document.querySelectorAll('span, div, a').forEach(el => {
+      const isReel = el.innerText === 'Reel' || 
+                    el.innerText === 'Reels' || 
+                    el.getAttribute('aria-label')?.includes('Reel');
 
-        if (hasReelText || hasReelAria) {
-          // Eliminar el contenedor del botón para que no quede el hueco
-          el.closest('div[role="listitem"]')?.remove();
-          el.closest('div[role="link"]')?.remove();
-          el.closest('a')?.remove();
+      if (isReel) {
+        // Facebook mete los botones en estructuras de 'listitem' o 'link'
+        const container = el.closest('div[role="listitem"]') || 
+                          el.closest('div[role="link"]') || 
+                          el.closest('a');
+        
+        if (container) {
+          container.style.display = 'none'; // Lo ocultamos primero para que sea instantáneo
+          container.remove(); // Luego lo borramos del mapa
         }
-      });
-    }
+      }
+    });
+  }
 
     // Especial YouTube: Quitar estantes de shorts por título
     if (host.includes('youtube')) {
